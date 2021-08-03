@@ -4,22 +4,22 @@
  * Add node to list (OK)
  * Print list (OK)
  * Remove node from list (OK)
- * Count number of elements ()
+ * Count number of elements (OK)
  * Sort list by id ()
  */
 
 #include <stdio.h>
 
-typedef struct ll_node {
+typedef struct {
     unsigned int id;
-    ll_node* next;
+    struct ll_node* next;
     void* sp;
-};
+}ll_node;
 
-typedef struct bla {
+typedef struct {
     int a;
     int b;
-};
+}bla;
 
 int ll_node_print (ll_node* p, void (*f)(void*)) {
     if (p == NULL)
@@ -30,7 +30,7 @@ int ll_node_print (ll_node* p, void (*f)(void*)) {
         printf (" %d ->", next->id);
         if (f != NULL) 
             f(next->sp);
-        next = next->next;
+        next = (ll_node*)next->next;
     }
     printf("\n");
     return ret;
@@ -42,9 +42,9 @@ int ll_node_add (ll_node* first, ll_node* second) {
     int ret = 0;
     ll_node* next = first;
     while (next->next != NULL) {
-        next = next->next;
+        next = (ll_node*)next->next;
     }
-    next->next = second;
+    next->next = (struct ll_node*)second;
     return ret;
 }
 
@@ -53,14 +53,18 @@ int ll_node_remove (ll_node* first, ll_node* n) {
         return -1;
     int ret = 0;
     ll_node* current = first;
-    while (current->next != n && current != NULL) {
-        current = current->next;        
+    while ((struct ll_node*)current->next != (struct ll_node*)n && current != NULL) {
+        current = (ll_node*)(current->next);        
     }
     if (current == NULL)
         return -1;
-    ll_node* next = current->next->next;
-    current->next->next = NULL;
-    current->next = next;
+    // ll_node* next = current->next->next;
+    ll_node* next = (ll_node*)current->next;
+    next = (ll_node*)next->next;
+    // current->next->next = NULL;
+    ll_node* temp = (ll_node*)current->next;
+    temp->next = NULL;
+    current->next = (struct ll_node*)next;
     return ret;
 }
 
@@ -71,7 +75,7 @@ int ll_node_count_elements (ll_node* first, unsigned int* output) {
     int ret = 0;
     ll_node* current = first;
     while (current != NULL) {
-        current = current->next;
+        current = (ll_node*)current->next;
         (*output)++;
     }
     return ret;
